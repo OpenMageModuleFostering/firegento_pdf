@@ -1,8 +1,8 @@
 <?php
 /**
- * This file is part of the FIREGENTO project.
+ * This file is part of a FireGento e.V. module.
  *
- * FireGento_Pdf is free software; you can redistribute it and/or
+ * This FireGento e.V. module is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License version 3 as
  * published by the Free Software Foundation.
  *
@@ -17,21 +17,17 @@
  * @author    FireGento Team <team@firegento.com>
  * @copyright 2013 FireGento Team (http://www.firegento.com)
  * @license   http://opensource.org/licenses/gpl-3.0 GNU General Public License, version 3 (GPLv3)
- * @version   $Id:$
- * @since     0.1.0
  */
+
 /**
- * Default item model rewrite.
+ * Class FireGento_Pdf_Model_Items_Downloadable
  *
- * @category  FireGento
- * @package   FireGento_Pdf
- * @author    FireGento Team <team@firegento.com>
- * @copyright 2013 FireGento Team (http://www.firegento.com)
- * @license   http://opensource.org/licenses/gpl-3.0 GNU General Public License, version 3 (GPLv3)
- * @version   $Id:$
- * @since     0.1.0
+ * @category FireGento
+ * @package  FireGento_Pdf
+ * @author   FireGento Team <team@firegento.com>
  */
-class FireGento_Pdf_Model_Items_Default extends Mage_Sales_Model_Order_Pdf_Items_Invoice_Default
+class FireGento_Pdf_Model_Items_Downloadable
+    extends Mage_Downloadable_Model_Sales_Order_Pdf_Items_Invoice
 {
     /**
      * Draw item line.
@@ -62,15 +58,17 @@ class FireGento_Pdf_Model_Items_Default extends Mage_Sales_Model_Order_Pdf_Items
 
         // draw SKU
         $lines[0][] = array(
-            'text' => Mage::helper('core/string')->str_split($this->getSku($item), 19),
-            'feed' => $pdf->margin['left'] + 25,
+            'text'      => Mage::helper('core/string')
+                ->str_split($this->getSku($item), 19),
+            'feed'      => $pdf->margin['left'] + 25,
             'font_size' => $fontSize
         );
 
         // draw Product name
         $lines[0][] = array(
-            'text' => Mage::helper('core/string')->str_split($item->getName(), 40, true, true),
-            'feed' => $pdf->margin['left'] + 130,
+            'text'      => Mage::helper('core/string')
+                ->str_split($item->getName(), 40, true, true),
+            'feed'      => $pdf->margin['left'] + 130,
             'font_size' => $fontSize
         );
 
@@ -80,9 +78,11 @@ class FireGento_Pdf_Model_Items_Default extends Mage_Sales_Model_Order_Pdf_Items
                 $optionTxt = $option['label'] . ': ';
                 // append option value
                 if ($option['value']) {
-                    $optionTxt .= isset($option['print_value']) ? $option['print_value'] : strip_tags($option['value']);
+                    $optionTxt .= isset($option['print_value'])
+                        ? $option['print_value'] : strip_tags($option['value']);
                 }
-                $optionArray = $pdf->_prepareText($optionTxt, $page, $pdf->getFontRegular(), $fontSize, 215);
+                $optionArray = $pdf->_prepareText($optionTxt, $page,
+                    $pdf->getFontRegular(), $fontSize, 215);
                 $lines[][] = array(
                     'text' => $optionArray,
                     'feed' => $pdf->margin['left'] + 135
@@ -90,13 +90,34 @@ class FireGento_Pdf_Model_Items_Default extends Mage_Sales_Model_Order_Pdf_Items
             }
         }
 
+        // downloadable Items
+        $_purchasedItems = $this->getLinks()->getPurchasedItems();
+
+        // draw Links title
+        $lines[][] = array(
+            'text' => Mage::helper('core/string')
+                ->str_split($this->getLinksTitle(), 70, true, true),
+            'feed' => $pdf->margin['left'] + 130,
+            'font' => 'italic',
+        );
+
+        // draw Links
+        foreach ($_purchasedItems as $_link) {
+            $lines[][] = array(
+                'text' => Mage::helper('core/string')
+                    ->str_split($_link->getLinkTitle(), 50, true, true),
+                'feed' => $pdf->margin['left'] + 135
+            );
+        }
+
+
         $columns = array();
         // prepare qty
         $columns['qty'] = array(
             'text'      => $item->getQty() * 1,
             'align'     => 'right',
             'font_size' => $fontSize,
-            '_width' => 30
+            '_width'    => 30
         );
 
         // prepare price
@@ -117,7 +138,7 @@ class FireGento_Pdf_Model_Items_Default extends Mage_Sales_Model_Order_Pdf_Items
 
         // prepare tax
         $columns['tax'] = array(
-            'text'      => $order->formatPriceTxt($item->getTaxAmount() + $item->getHiddenTaxAmount()),
+            'text'      => $order->formatPriceTxt($item->getTaxAmount()),
             'align'     => 'right',
             'font_size' => $fontSize,
             '_width'    => 50
@@ -125,7 +146,8 @@ class FireGento_Pdf_Model_Items_Default extends Mage_Sales_Model_Order_Pdf_Items
 
         // prepare tax_rate
         $columns['tax_rate'] = array(
-            'text'      => round($item->getOrderItem()->getTaxPercent(), 2) . '%',
+            'text'      => round($item->getOrderItem()->getTaxPercent(), 2)
+                . '%',
             'align'     => 'right',
             'font_size' => $fontSize,
             '_width'    => 50
@@ -133,7 +155,8 @@ class FireGento_Pdf_Model_Items_Default extends Mage_Sales_Model_Order_Pdf_Items
 
         // prepare subtotal
         $columns['subtotal'] = array(
-            'text'      => $order->formatPriceTxt($item->getRowTotal()),
+            'text'      => $order->formatPriceTxt($item->getPrice()
+                * $item->getQty() * 1),
             'align'     => 'right',
             'font_size' => $fontSize,
             '_width'    => 50
@@ -141,14 +164,16 @@ class FireGento_Pdf_Model_Items_Default extends Mage_Sales_Model_Order_Pdf_Items
 
         // prepare subtotal_incl_tax
         $columns['subtotal_incl_tax'] = array(
-            'text'      => $order->formatPriceTxt($item->getRowTotalInclTax()),
+            'text'      => $order->formatPriceTxt(($item->getPrice()
+                    * $item->getQty() * 1) + $item->getTaxAmount()),
             'align'     => 'right',
             'font_size' => $fontSize,
             '_width'    => 70
         );
 
         // draw columns in specified order
-        $columnsOrder = explode(',', Mage::getStoreConfig('sales_pdf/invoice/item_price_column_order'));
+        $columnsOrder = explode(',',
+            Mage::getStoreConfig('sales_pdf/invoice/item_price_column_order'));
         // draw starting from right
         $columnsOrder = array_reverse($columnsOrder);
         $columnOffset = 0;
@@ -163,7 +188,9 @@ class FireGento_Pdf_Model_Items_Default extends Mage_Sales_Model_Order_Pdf_Items
             }
         }
 
-        if (Mage::getStoreConfig('sales_pdf/invoice/show_item_discount') && 0 < $item->getDiscountAmount()) {
+        if (Mage::getStoreConfig('sales_pdf/invoice/show_item_discount')
+            && 0 < $item->getDiscountAmount()
+        ) {
             // print discount
             $text = Mage::helper('firegento_pdf')->__(
                 'You get a discount of %s.',
@@ -181,7 +208,8 @@ class FireGento_Pdf_Model_Items_Default extends Mage_Sales_Model_Order_Pdf_Items
             'height' => 15
         );
 
-        $page = $pdf->drawLineBlocks($page, array($lineBlock), array('table_header' => true));
+        $page = $pdf->drawLineBlocks($page, array($lineBlock),
+            array('table_header' => true));
         $this->setPage($page);
     }
 }

@@ -20,6 +20,7 @@
  * @version   $Id:$
  * @since     0.1.0
  */
+
 /**
  * Dummy data helper for translation issues.
  *
@@ -37,6 +38,15 @@ class FireGento_Pdf_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_SALES_PDF_INVOICE_SHOW_CUSTOMER_NUMBER = 'sales_pdf/invoice/show_customer_number';
     const XML_PATH_SALES_PDF_SHIPMENT_SHOW_CUSTOMER_NUMBER = 'sales_pdf/shipment/show_customer_number';
     const XML_PATH_SALES_PDF_CREDITMEMO_SHOW_CUSTOMER_NUMBER = 'sales_pdf/creditmemo/show_customer_number';
+    const XML_PATH_SALES_PDF_INVOICE_FILENAME_EXPORT_PATTERN = 'sales_pdf/invoice/filename_export_pattern';
+    const XML_PATH_SALES_PDF_SHIPMENT_FILENAME_EXPORT_PATTERN = 'sales_pdf/shipment/filename_export_pattern';
+    const XML_PATH_SALES_PDF_CREDITMEMO_FILENAME_EXPORT_PATTERN = 'sales_pdf/creditmemo/filename_export_pattern';
+
+    const XML_PATH_REGULAR_FONT = 'sales_pdf/firegento_pdf_fonts/regular_font';
+    const XML_PATH_BOLD_FONT = 'sales_pdf/firegento_pdf_fonts/bold_font';
+    const XML_PATH_ITALIC_FONT = 'sales_pdf/firegento_pdf_fonts/italic_font';
+
+    const FONT_PATH_IN_MEDIA = '/firegento_pdf/fonts';
 
     /**
      * Return the order id or false if order id should not be displayed on document.
@@ -83,31 +93,47 @@ class FireGento_Pdf_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param mixed $store
+     * Whether the logo should be shown in full width.
      *
-     * @return bool
+     * @param  mixed $store store to get information from
+     *
+     * @return bool whether the logo should be shown in full width
      */
     public function isLogoFullWidth($store)
     {
-        $configSetting = Mage::getStoreConfig(self::XML_PATH_FIREGENTO_PDF_LOGO_POSITION, $store);
-        return $configSetting == FireGento_Pdf_Model_System_Config_Source_Logo::FULL_WIDTH;
+        $configSetting = Mage::getStoreConfig(
+            self::XML_PATH_FIREGENTO_PDF_LOGO_POSITION, $store
+        );
+        $fullWidth = FireGento_Pdf_Model_System_Config_Source_Logo::FULL_WIDTH;
+        return $configSetting == $fullWidth;
     }
 
     /**
-     * @param string $mode
-     * @param mixed  $store
+     * Whether the customer number should be shown.
      *
-     * @return bool
+     * @param  string $mode  the mode of this document like invoice, shipment or creditmemo
+     * @param  mixed  $store store to get information from
+     *
+     * @return bool whether the customer number should be shown
      */
     public function showCustomerNumber($mode = 'invoice', $store)
     {
         switch ($mode) {
             case 'invoice':
-                return Mage::getStoreConfigFlag(self::XML_PATH_SALES_PDF_INVOICE_SHOW_CUSTOMER_NUMBER, $store);
+                return Mage::getStoreConfigFlag(
+                    self::XML_PATH_SALES_PDF_INVOICE_SHOW_CUSTOMER_NUMBER,
+                    $store
+                );
             case 'shipment':
-                return Mage::getStoreConfigFlag(self::XML_PATH_SALES_PDF_SHIPMENT_SHOW_CUSTOMER_NUMBER, $store);
+                return Mage::getStoreConfigFlag(
+                    self::XML_PATH_SALES_PDF_SHIPMENT_SHOW_CUSTOMER_NUMBER,
+                    $store
+                );
             case 'creditmemo':
-                return Mage::getStoreConfigFlag(self::XML_PATH_SALES_PDF_CREDITMEMO_SHOW_CUSTOMER_NUMBER, $store);
+                return Mage::getStoreConfigFlag(
+                    self::XML_PATH_SALES_PDF_CREDITMEMO_SHOW_CUSTOMER_NUMBER,
+                    $store
+                );
         }
         return true; // backwards compatibility
     }
@@ -143,5 +169,113 @@ class FireGento_Pdf_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return array($width, $height);
+    }
+
+    /**
+     * Return export pattern config value
+     *
+     * @param  string $type the type of this document like invoice, shipment or creditmemo
+     *
+     * @return string
+     */
+    public function getExportPattern($type)
+    {
+        switch ($type) {
+            case 'invoice':
+                return Mage::getStoreConfig(
+                    self::XML_PATH_SALES_PDF_INVOICE_FILENAME_EXPORT_PATTERN
+                );
+            case 'shipment':
+                return Mage::getStoreConfig(
+                    self::XML_PATH_SALES_PDF_SHIPMENT_FILENAME_EXPORT_PATTERN
+                );
+            case 'creditmemo':
+                return Mage::getStoreConfig(
+                    self::XML_PATH_SALES_PDF_CREDITMEMO_FILENAME_EXPORT_PATTERN
+                );
+        }
+        return true;
+    }
+
+    /**
+     * Gets the variables which can be used as a placeholder in the filename.
+     *
+     * @param  Mage_Core_Model_Abstract $model the model instance
+     *
+     * @return array with the variables which can be use as placeholders in the filename
+     */
+    public function getModelVars($model)
+    {
+        if (!$model instanceof Mage_Sales_Model_Order) {
+            switch ($model) {
+                case $model instanceof Mage_Sales_Model_Order_Invoice:
+                    $specificVars = array(
+                        '{{invoice_id}}' => $model->getIncrementId()
+                    );
+                    break;
+                case $model instanceof Mage_Sales_Model_Order_Shipment:
+                    $specificVars = array(
+                        '{{shipment_id}}' => $model->getIncrementId()
+                    );
+                    break;
+                case $model instanceof Mage_Sales_Model_Order_Creditmemo:
+                    $specificVars = array(
+                        '{{creditmemo_id}}' => $model->getIncrementId()
+                    );
+            }
+            $order = $model->getOrder();
+            $commonVars = array(
+                '{{order_id}}'           => $order->getIncrementId(),
+                '{{customer_id}}'        => $order->getCustomerId(),
+                '{{customer_name}}'      => $order->getCustomerName(),
+                '{{customer_firstname}}' => $order->getCustomerFirstname(),
+                '{{customer_lastname}}'  => $order->getCustomerLastname()
+            );
+            return array_merge($specificVars, $commonVars);
+        } else {
+            return array(
+                '{{order_id}}'           => $model->getIncrementId(),
+                '{{customer_id}}'        => $model->getCustomerId(),
+                '{{customer_name}}'      => $model->getCustomerName(),
+                '{{customer_firstname}}' => $model->getCustomerFirstname(),
+                '{{customer_lastname}}'  => $model->getCustomerLastname()
+            );
+        }
+    }
+
+    /**
+     * The filename of the exported file.
+     *
+     * @param  string                   $type  the type of this document like invoice, shipment or creditmemo
+     * @param  Mage_Core_Model_Abstract $model the model instance
+     *
+     * @return string the filename of the exported file
+     */
+    public function getExportFilename($type, $model)
+    {
+        $type = (!$type) ? 'invoice' : $type;
+        $pattern = $this->getExportPattern($type);
+        if (!$pattern) {
+            $date = Mage::getSingleton('core/date');
+            $pattern = $type . $date->date('Y-m-d_H-i-s');
+        }
+        if (substr($pattern, -4) != '.pdf') {
+            $pattern = $pattern . '.pdf';
+        }
+
+        $path = strftime($pattern, strtotime($model->getCreatedAt()));
+        $vars = $this->getModelVars($model);
+
+        return strtr($path, $vars);
+    }
+
+    /**
+     * Returns the path where the fonts reside.
+     *
+     * @return string the path where the fonts reside
+     */
+    public function getFontPath()
+    {
+        return Mage::getBaseDir('media') . self::FONT_PATH_IN_MEDIA;
     }
 }

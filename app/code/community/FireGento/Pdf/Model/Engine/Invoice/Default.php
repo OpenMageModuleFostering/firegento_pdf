@@ -58,10 +58,9 @@ class FireGento_Pdf_Model_Engine_Invoice_Default extends FireGento_Pdf_Model_Eng
         $pdf = new Zend_Pdf();
         $this->_setPdf($pdf);
 
-        // pagecounter is 0 at the beginning, because it is incremented in newPage()
-        $this->pagecounter = 0;
-
         foreach ($invoices as $invoice) {
+            // pagecounter is 0 at the beginning, because it is incremented in newPage()
+            $this->pagecounter = 0;
             if ($invoice->getStoreId()) {
                 Mage::app()->getLocale()->emulate($invoice->getStoreId());
                 Mage::app()->setCurrentStore($invoice->getStoreId());
@@ -115,7 +114,7 @@ class FireGento_Pdf_Model_Engine_Invoice_Default extends FireGento_Pdf_Model_Eng
     /**
      * Insert Table Header for Items
      *
-     * @param  Zend_Pdf_Page $page current page object of Zend_PDF
+     * @param  Zend_Pdf_Page &$page current page object of Zend_PDF
      *
      * @return void
      */
@@ -209,6 +208,10 @@ class FireGento_Pdf_Model_Engine_Invoice_Default extends FireGento_Pdf_Model_Eng
         );
         $this->_renderers['bundle'] = array(
             'model'    => 'firegento_pdf/items_bundle',
+            'renderer' => null
+        );
+        $this->_renderers['downloadable'] = array(
+            'model'    => 'firegento_pdf/items_downloadable',
             'renderer' => null
         );
     }

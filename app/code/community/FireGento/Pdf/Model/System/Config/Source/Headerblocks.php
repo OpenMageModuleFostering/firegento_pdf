@@ -21,7 +21,7 @@
  * @since     0.1.0
  */
 /**
- * Shipment model rewrite.
+ * Logo position source model.
  *
  * @category  FireGento
  * @package   FireGento_Pdf
@@ -31,48 +31,29 @@
  * @version   $Id:$
  * @since     0.1.0
  */
-class FireGento_Pdf_Model_Shipment
+class FireGento_Pdf_Model_System_Config_Source_Headerblocks
 {
+    const LEFT = 'left';
+    const RIGHT = 'right';
 
     /**
-     * The actual PDF engine responsible for rendering the file.
+     * Return array of possible positions.
      *
-     * @var Mage_Sales_Model_Order_Pdf_Abstract
+     * @return array
      */
-    private $_engine;
-
-    /**
-     * get pdf rendering engine
-     *
-     * @return Mage_Sales_Model_Order_Pdf_Abstract|Mage_Sales_Model_Order_Pdf_Shipment
-     */
-    protected function getEngine()
+    public function toOptionArray()
     {
-        if (!$this->_engine) {
-            $modelClass = Mage::getStoreConfig('sales_pdf/shipment/engine');
-            $engine = Mage::getModel($modelClass);
-
-            if (!$engine) {
-                // Fallback to Magento standard shipment layout.
-                $engine = new Mage_Sales_Model_Order_Pdf_Shipment();
-            }
-
-            $this->_engine = $engine;
+        $positions = array(
+            self::LEFT       => Mage::helper('firegento_pdf')->__('Left'),
+            self::RIGHT      => Mage::helper('firegento_pdf')->__('Right'),
+        );
+        $options = array();
+        foreach ($positions as $k => $v) {
+            $options[] = array(
+                'value' => $k,
+                'label' => $v
+            );
         }
-
-        return $this->_engine;
+        return $options;
     }
-
-    /**
-     * get PDF object
-     *
-     * @param  array|Varien_Data_Collection $shipments shipments to generate pdfs for
-     *
-     * @return mixed
-     */
-    public function getPdf($shipments = array())
-    {
-        return $this->getEngine()->getPdf($shipments);
-    }
-
 }

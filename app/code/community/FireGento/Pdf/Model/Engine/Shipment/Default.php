@@ -20,6 +20,7 @@
  * @version   $Id:$
  * @since     0.1.0
  */
+
 /**
  * Shipment model rewrite.
  *
@@ -31,7 +32,8 @@
  * @version   $Id:$
  * @since     0.1.0
  */
-class FireGento_Pdf_Model_Engine_Shipment_Default extends FireGento_Pdf_Model_Engine_Abstract
+class FireGento_Pdf_Model_Engine_Shipment_Default
+    extends FireGento_Pdf_Model_Engine_Abstract
 {
 
     /**
@@ -58,10 +60,9 @@ class FireGento_Pdf_Model_Engine_Shipment_Default extends FireGento_Pdf_Model_En
         $pdf = new Zend_Pdf();
         $this->_setPdf($pdf);
 
-        // pagecounter is 0 at the beginning, because it is incremented in newPage()
-        $this->pagecounter = 0;
-
         foreach ($shipments as $shipment) {
+            // pagecounter is 0 at the beginning, because it is incremented in newPage()
+            $this->pagecounter = 0;
             if ($shipment->getStoreId()) {
                 Mage::app()->getLocale()->emulate($shipment->getStoreId());
                 Mage::app()->setCurrentStore($shipment->getStoreId());
@@ -86,7 +87,8 @@ class FireGento_Pdf_Model_Engine_Shipment_Default extends FireGento_Pdf_Model_En
                 }
 
                 if ($this->y < 50
-                    || (Mage::getStoreConfig('sales_pdf/firegento_pdf/show_footer') == 1
+                    || (Mage::getStoreConfig('sales_pdf/firegento_pdf/show_footer')
+                        == 1
                         && $this->y < 100)
                 ) {
                     $page = $this->newPage(array());
@@ -111,17 +113,19 @@ class FireGento_Pdf_Model_Engine_Shipment_Default extends FireGento_Pdf_Model_En
     /**
      * Inserts the customer's shipping address.
      *
-     * @param  Zend_Pdf_Page          $page  Current page object of Zend_Pdf
-     * @param  Mage_Sales_Model_Order $order Order object
+     * @param  Zend_Pdf_Page          &$page current page object of Zend_Pdf
+     * @param  Mage_Sales_Model_Order $order order object
      *
      * @return void
      */
     protected function _insertCustomerAddress(&$page, $order)
     {
         $this->_setFontRegular($page, 9);
-        $shipping = $this->_formatAddress($order->getShippingAddress()->format('pdf'));
+        $shipping = $this->_formatAddress($order->getShippingAddress()
+                ->format('pdf'));
         foreach ($shipping as $line) {
-            $page->drawText(trim(strip_tags($line)), $this->margin['left'], $this->y, $this->encoding);
+            $page->drawText(trim(strip_tags($line)), $this->margin['left'],
+                $this->y, $this->encoding);
             $this->Ln(12);
         }
     }
@@ -136,7 +140,8 @@ class FireGento_Pdf_Model_Engine_Shipment_Default extends FireGento_Pdf_Model_En
         $page->setFillColor($this->colors['grey1']);
         $page->setLineColor($this->colors['grey1']);
         $page->setLineWidth(1);
-        $page->drawRectangle($this->margin['left'], $this->y, $this->margin['right'] - 10, $this->y - 15);
+        $page->drawRectangle($this->margin['left'], $this->y,
+            $this->margin['right'] - 10, $this->y - 15);
 
         $page->setFillColor($this->colors['black']);
         $this->_setFontRegular($page, 9);
@@ -173,10 +178,12 @@ class FireGento_Pdf_Model_Engine_Shipment_Default extends FireGento_Pdf_Model_En
     {
         $this->_setFontRegular($page, 9);
 
-        $billing = $this->_formatAddress($order->getShippingAddress()->format('pdf'));
+        $billing = $this->_formatAddress($order->getShippingAddress()
+                ->format('pdf'));
 
         foreach ($billing as $line) {
-            $page->drawText(trim(strip_tags($line)), $this->margin['left'], $this->y, $this->encoding);
+            $page->drawText(trim(strip_tags($line)), $this->margin['left'],
+                $this->y, $this->encoding);
             $this->Ln(12);
         }
     }
