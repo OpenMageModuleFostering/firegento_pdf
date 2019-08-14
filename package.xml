@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+    <name>FireGento_Pdf</name>
+    <version>1.0.0</version>
+    <stability>stable</stability>
+    <license>OSL 3.0</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>FireGento PDF overwrites standard PDF layouts for invoices, shipments and creditmemos.</summary>
+    <description>FireGento PDF overwrites standard PDF layouts for invoices, shipments and creditmemos. Anyway, you can still use the standard Magento layout, because the extension is highly configurable.</description>
+    <notes>First release</notes>
+    <authors><author><name>FireGento Team</name><user>firegento</user><email>team@firegento.com</email></author></authors>
+    <date>2013-06-01</date>
+    <time>10:11:41</time>
+    <contents><target name="magecommunity"><dir name="FireGento"><dir name="Pdf"><dir name="Helper"><file name="Data.php" hash="b197385beacefb9726be15e99f87c21f"/></dir><dir name="Model"><file name="Abstract.php" hash="ca9d79d74763732906fe294816ef642a"/><file name="Creditmemo.php" hash="60f852ac54d8d9d1303e511c61fa9754"/><dir name="Engine"><dir name="Invoice"><file name="Default.php" hash="5ba50d6e1c72e91ec308f7e196fd6330"/></dir></dir><file name="Invoice.php" hash="75a7ec8f8ba8b505da13750eb6615135"/><dir name="Items"><file name="Bundle.php" hash="5baecc71b3d44fa7a113a63008bbf10a"/><file name="Default.php" hash="fdf793d9437e01ea402acee98bb4a0b5"/><file name="Grouped.php" hash="eb59e0bbeac4750beb30af5e4fdc56e3"/><dir name="Shipment"><file name="Bundle.php" hash="7fac91000132878ad98f1d3479fc2456"/><file name="Default.php" hash="8c24b8474bcc734274e392e6791e6aa2"/></dir></dir><file name="Observer.php" hash="6d2d144bd5fcd2a3246d67687ca71b53"/><file name="Shipment.php" hash="44b98508c96e7d09da81eb156329d694"/><dir name="System"><dir name="Config"><dir name="Source"><file name="Engine.php" hash="a74e6c93635fcfe078f787d4ac1282a5"/><file name="Logo.php" hash="37485e2799c9394434cc49d72ed239e4"/><file name="Payment.php" hash="2c443eb8bf897148debeccf638f39849"/><file name="Shipping.php" hash="76bf4c6afbb18bf2d2172707509125df"/></dir></dir></dir></dir><dir name="controllers"><dir name="Sales"><file name="OrderController.php" hash="38df8d94fe6035b99a543f8212db58d1"/></dir></dir><dir name="etc"><file name="config.xml" hash="65306ab3d0fded2dc8d917f95fd5824f"/><file name="system.xml" hash="4af14b38509ec75dfac8d10f5b734d3a"/></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="FireGento_Pdf.xml" hash="b50e6c2f168aff9a4fb983240f1d8941"/></dir></target><target name="magelocale"><dir><dir name="de_DE"><file name="FireGento_Pdf.csv" hash="988e48f0b179d0723909433ad6b833e0"/></dir></dir></target></contents>
+    <compatible/>
+    <dependencies><required><php><min>5.2.0</min><max>6.0.0</max></php></required></dependencies>
+</package>
