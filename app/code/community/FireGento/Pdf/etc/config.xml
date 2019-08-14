@@ -2,7 +2,7 @@
 <config>
     <modules>
         <FireGento_Pdf>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </FireGento_Pdf>
     </modules>
     <global>
@@ -49,6 +49,22 @@
                     </firegento_pdf>
                 </observers>
             </firegento_pdf_invoice_insert_note>
+            <firegento_pdf_shipment_insert_note>
+                <observers>
+                    <firegento_pdf>
+                        <class>firegento_pdf/observer</class>
+                        <method>addShippingMethod</method>
+                    </firegento_pdf>
+                </observers>
+            </firegento_pdf_shipment_insert_note>
+            <firegento_pdf_shipment_edit_page>
+                <observers>
+                    <firegento_pdf>
+                        <class>firegento_pdf/observer</class>
+                        <method>addBarcode</method>
+                    </firegento_pdf>
+                </observers>
+            </firegento_pdf_shipment_edit_page>
         </events>
         <pdf>
             <!-- fix totals order -->
@@ -93,14 +109,28 @@
     <default>
         <sales_pdf>
             <invoice>
-                <engine></engine>
+                <engine />
+                <show_customer_number>1</show_customer_number>
+                <show_date_notice>0</show_date_notice>
+                <maturity/>
+                <payment_method_position/>
+                <shipping_method_position/>
+                <show_comments>0</show_comments>
+                <note/>
                 <item_price_column_order>price_incl_tax,qty,tax,subtotal_incl_tax</item_price_column_order>
+                <show_item_discount>0</show_item_discount>
             </invoice>
             <shipment>
-                <engine></engine>
+                <engine />
+                <show_customer_number>1</show_customer_number>
+                <shipping_method_position/>
+                <note/>
+                <order_id_as_barcode>0</order_id_as_barcode>
             </shipment>
             <creditmemo>
-                <engine></engine>
+                <engine />
+                <show_customer_number>1</show_customer_number>
+                <note/>
             </creditmemo>
         </sales_pdf>
         <tax>
