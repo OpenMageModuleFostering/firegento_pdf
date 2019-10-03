@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/FireGento_Pdf",
+    "name": "OpenMageModuleFostering\/FireGento_Pdf",
     "type": "magento-module",
     "license": "GPL-3.0",
     "homepage": "",
     "description": "FireGento PDF overwrites standard PDF layouts for invoices, shipments and creditmemos.",
     "authors": [
-    {
-        "name": "FireGento Team",
-        "email": "team@firegento.com"
-    }
-],
+        {
+            "name": "FireGento Team",
+            "email": "team@firegento.com"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
